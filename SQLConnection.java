@@ -3,7 +3,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-//to run this, must have .jar file in this directory. To set classpath , use 'export CLASSPATH=/path/to/mysql-connector-java-8.0.17.jar:$CLASSPATH'
+//to run this, must have .jar file in this directory. To set classpath , use 'export CLASSPATH=/path/to/mysql-connector-java-8.0.17.jar:$CLASSPATH'.
+//Add the line to ~/.bashrc at end, to source automatically
 class SQLConnection{ 
     
     public static void main(String args[]) throws Exception{  
@@ -15,6 +16,11 @@ class SQLConnection{
             Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
             stmt=con.createStatement();
             rs=stmt.executeQuery("SELECT * FROM users");
+            while(rs.next())
+            {
+                    System.out.println(rs.getInt(1)+" "+rs.getString(2)+" "+rs.getString(4));
+            }
+            con.close();
             
         }
         catch(SQLException e)
@@ -25,7 +31,7 @@ class SQLConnection{
         }  
         catch(Exception e)
         {
-            System.out.println("Whoops");
+            System.out.println(e);
         }
         finally
         {
