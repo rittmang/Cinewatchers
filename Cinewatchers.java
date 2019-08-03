@@ -7,7 +7,7 @@ public class Cinewatchers{
     String fpassword = new String("pass");
     String msg = "";
     JTextField txtUsername = null;
-    JTextField txtPassword = null;
+    JPasswordField txtPassword = null;
     JFrame frame;
      
     public static void main(String[] args){
@@ -22,7 +22,7 @@ public class Cinewatchers{
         JLabel lblUsername = new JLabel("Username:");   
         JLabel lblPassword = new JLabel("Password:");
         txtUsername = new JTextField(20);
-        txtPassword = new JTextField(20);
+        txtPassword = new JPasswordField(20);
         JButton btnLogin = new JButton("Login");
         btnLogin.addActionListener(new LoginListener());
         JButton btnCancel = new JButton("Cancel");
@@ -50,9 +50,10 @@ public class Cinewatchers{
  
     public class LoginListener implements ActionListener{
         public void actionPerformed(ActionEvent event){
-            
+            String password=new String(txtPassword.getPassword());//shouldn't be doing really, but is easy
+
             if(fusername.equals(txtUsername.getText())){
-                if(fpassword.equals(txtPassword.getText())){
+                if(fpassword.equals(password)){
                    
                     msg = "Login Granted!";
                      frame.getContentPane().removeAll();//removes all previous components, get a blank screen
@@ -89,5 +90,6 @@ class Home
     public void go()
     {
         home_frame=new JFrame();
+        home_frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
     }
 }
