@@ -134,7 +134,6 @@ class Home
     
     public void go(JFrame frame)//uses same frame from Cinewatchers class
     {
-       
         JLabel l=new JLabel();
         l.setText("Welcome to Cinewatchers");
         JPanel p=new JPanel();
