@@ -82,10 +82,9 @@ public class Cinewatchers{
 class Home
 {
     JFrame home_frame;
-    public static void beginning()
+    public void beginning()
     {
-        Home h=new Home();
-        h.go();
+        this.go();
     }
     public void go()
     {
