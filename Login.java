@@ -36,7 +36,8 @@ public class Login{
         panel.add(btnCancel);         
         frame.getContentPane().add(BorderLayout.CENTER,panel);
         frame.getRootPane().setDefaultButton(btnLogin);
- 
+        ImageIcon ficon=new ImageIcon("/home/ritom/Desktop/Java/DBMS/Folder-TV-Disney-icon.png");
+        frame.setIconImage(ficon.getImage());
  
         //frame.setSize(300,300);
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
