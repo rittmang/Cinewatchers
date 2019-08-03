@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
  
-public class Login{
+public class IMDb{
     String fusername = new String("james3302");
     String fpassword = new String("pass");
     String msg = "";
@@ -11,11 +11,12 @@ public class Login{
     JFrame frame;
      
     public static void main(String[] args){
-        Login gui = new Login();
+        IMDb gui = new IMDb();
         gui.go();
     }
     public void go(){
-        frame = new JFrame();
+        frame = new JFrame("IMDb");
+        frame.setTitle("IMDb");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         JPanel panel = new JPanel();
         JLabel lblUsername = new JLabel("Username:");   
