@@ -59,7 +59,7 @@ public class Cinewatchers{
                      frame.getContentPane().removeAll();//removes all previous components, get a blank screen
                      frame.getContentPane().repaint();
                      Home h=new Home();
-                     h.beginning();
+                     h.go(frame);
                 }
                 else{
                     msg = "Username/Password Error";
@@ -82,14 +82,16 @@ public class Cinewatchers{
 
 class Home
 {
-    JFrame home_frame;
-    public void beginning()
+    
+    public void go(JFrame frame)//uses same frame from Cinewatchers class
     {
-        this.go();
-    }
-    public void go()
-    {
-        home_frame=new JFrame();
-        home_frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+       
+        JLabel l=new JLabel();
+        l.setText("Welcome to Cinewatchers");
+        JPanel p=new JPanel();
+        p.add(l);
+        frame.add(p);
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        frame.setVisible(true);
     }
 }
