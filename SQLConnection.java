@@ -20,6 +20,11 @@ class SQLConnection{
             {
                     System.out.println(rs.getInt(1)+" "+rs.getString(2)+" "+rs.getString(4));
             }
+            rs=stmt.executeQuery("desc users");
+            while(rs.next())
+            {
+                    System.out.println(rs.getInt(1)+" "+rs.getString(2)+" "+rs.getString(4));
+            }
             con.close();
             
         }

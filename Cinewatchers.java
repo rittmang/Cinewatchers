@@ -1,14 +1,19 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.Statement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
  
 public class Cinewatchers{
-    String fusername = new String("james3302");
-    String fpassword = new String("pass");
     String msg = "";
     JTextField txtUsername = null;
     JPasswordField txtPassword = null;
     JFrame frame;
+    Statement stmt=null;//SQL
+    ResultSet rs=null;//SQL
      
     public static void main(String[] args){
         Cinewatchers gui = new Cinewatchers();
@@ -50,23 +55,67 @@ public class Cinewatchers{
  
     public class LoginListener implements ActionListener{
         public void actionPerformed(ActionEvent event){
-            String password=new String(txtPassword.getPassword());//shouldn't be doing really, but is easy
+            try{
+            Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); 
+            Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
+            stmt=con.createStatement();
+            rs=stmt.executeQuery("SELECT * FROM users");
+            String password=new String(txtPassword.getPassword());//get from window
+            int signed_in=0;
 
-            if(fusername.equals(txtUsername.getText())){
-                if(fpassword.equals(password)){
-                   
-                    msg = "Login Granted!";
-                     frame.getContentPane().removeAll();//removes all previous components, get a blank screen
-                     frame.getContentPane().repaint();
-                     Home h=new Home();
-                     h.go(frame);
+            while(rs.next())
+            {
+                 if((txtUsername.getText()).equals(rs.getString(2)))
+                 {
+                     if(password.equals(rs.getString(3)))
+                     {
+                         msg="Login Granted";
+                         frame.getContentPane().removeAll();//removes all previous components, get a blank screen
+                         frame.getContentPane().repaint();
+                         Home h=new Home();
+                         h.go(frame);
+                         signed_in=1;
+                     }
+                 } 
+            }
+            if(signed_in==0)
+                msg="Incorrect sign-in.";
+            con.close();
+            }
+            catch(SQLException e)
+            {
+                System.out.println("SQLException: " + e.getMessage());
+                System.out.println("SQLState: " + e.getSQLState());
+                System.out.println("VendorError: " + e.getErrorCode());
+            }
+            catch(Exception e)
+            {
+                System.out.println(e);
+            }
+            finally{
+                if(rs!=null)
+            {
+                try{
+                    rs.close();
                 }
-                else{
-                    msg = "Username/Password Error";
+                catch(SQLException sqlEx)
+                {
+
                 }
-            }else{
-                msg = "Account does not exist";
-            }   
+                rs=null;
+            }
+            if(stmt!=null)
+            {
+                try{
+                    stmt.close();
+                }
+                catch(SQLException sqlEx)
+                {
+
+                }
+                stmt=null;
+            }
+            }
             JOptionPane.showMessageDialog(null,msg,"Alert",JOptionPane.INFORMATION_MESSAGE);
                               
         }
