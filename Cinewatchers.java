@@ -2,7 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
  
-public class IMDb{
+public class Cinewatchers{
     String fusername = new String("james3302");
     String fpassword = new String("pass");
     String msg = "";
@@ -11,12 +11,12 @@ public class IMDb{
     JFrame frame;
      
     public static void main(String[] args){
-        IMDb gui = new IMDb();
+        Cinewatchers gui = new Cinewatchers();
         gui.go();
     }
     public void go(){
-        frame = new JFrame("IMDb");
-        frame.setTitle("IMDb");
+        frame = new JFrame("Cinewatchers");
+        frame.setTitle("Cinewatchers");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         JPanel panel = new JPanel();
         JLabel lblUsername = new JLabel("Username:");   
@@ -37,7 +37,7 @@ public class IMDb{
         panel.add(btnCancel);         
         frame.getContentPane().add(BorderLayout.CENTER,panel);
         frame.getRootPane().setDefaultButton(btnLogin);
-        ImageIcon ficon=new ImageIcon("/home/ritom/Desktop/Java/DBMS/Folder-TV-Disney-icon.png");
+        ImageIcon ficon=new ImageIcon("/home/ritom/Desktop/Java/DBMS/icon_cw.png");
         frame.setIconImage(ficon.getImage());
  
         //frame.setSize(300,300);
