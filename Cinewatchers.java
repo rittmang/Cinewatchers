@@ -85,7 +85,7 @@ public class Cinewatchers{
                  } 
             }
             if(signed_in==0)
-                msg="Incorrect sign-in.";
+                JOptionPane.showMessageDialog(null,"Incorrect credentials","Alert",JOptionPane.INFORMATION_MESSAGE);
             con.close();
             }
             catch(SQLException e)
@@ -122,7 +122,7 @@ public class Cinewatchers{
                 stmt=null;
             }
             }
-            JOptionPane.showMessageDialog(null,msg,"Alert",JOptionPane.INFORMATION_MESSAGE);
+            
                               
         }
     }
@@ -155,7 +155,7 @@ class Home
         p.add(l);
         new_frame.add(p);
         new_frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
-        JButton btnShowReviews = new JButton("Show Reviews");
+        JButton btnShowReviews = new JButton("Show my reviews");
         btnShowReviews.addActionListener(new ShowReviewsListener());
         p.add(btnShowReviews);
         //System.out.println(all_reviews);
@@ -212,24 +212,14 @@ class Home
             finally{
                 if(rs!=null)
             {
-                try{
-                    rs.close();
-                }
-                catch(SQLException sqlEx)
-                {
-
-                }
+                try{rs.close();}
+                catch(SQLException sqlEx){}
                 rs=null;
             }
             if(stmt!=null)
             {
-                try{
-                    stmt.close();
-                }
-                catch(SQLException sqlEx)
-                {
-
-                }
+                try{stmt.close();}
+                catch(SQLException sqlEx){}
                 stmt=null;
             }
             }
