@@ -35,6 +35,8 @@ public class Cinewatchers{
         btnLogin.addActionListener(new LoginListener());
         JButton btnCancel = new JButton("Cancel");
         btnCancel.addActionListener(new CancelListener());
+        JButton btnRegister = new JButton("Register");//basically add new user
+        btnRegister.addActionListener(new RegisterListener());
      
  
         panel.add(lblUsername);
@@ -42,7 +44,8 @@ public class Cinewatchers{
         panel.add(lblPassword);
         panel.add(txtPassword);
         panel.add(btnLogin);
-        panel.add(btnCancel);         
+        panel.add(btnCancel);
+        panel.add(btnRegister);         
         frame.getContentPane().add(BorderLayout.CENTER,panel);
         frame.getRootPane().setDefaultButton(btnLogin);
         ImageIcon ficon=new ImageIcon("/home/ritom/Desktop/Java/DBMS/icon_cw.png");
@@ -126,11 +129,21 @@ public class Cinewatchers{
                               
         }
     }
+    
     public class CancelListener implements ActionListener{
         public void actionPerformed(ActionEvent event){
             txtUsername.setText("");
             txtPassword.setText("");
             txtUsername.requestFocus();
+        }
+    }
+    public class RegisterListener implements ActionListener{
+        public void actionPerformed(ActionEvent event){
+            txtUsername.setText("");
+            txtPassword.setText("");
+            txtUsername.requestFocus();
+            Register r=new Register();
+            r.go();
         }
     }
 }
@@ -229,4 +242,110 @@ class Home
         }
     }
 
+}
+
+class Register
+{
+    String msg = "";
+    JTextField txtUsername = null;
+    JPasswordField txtPassword = null;
+    JTextField txtName=null;
+    JFrame frame;
+    Statement stmt=null;//SQL
+   // ResultSet rs=null;//SQL
+    public void go()
+    {
+        frame = new JFrame("Cinewatchers-Register");
+        frame.setTitle("Cinewatchers-Register");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        JPanel panel = new JPanel();
+        JLabel lblUsername = new JLabel("Enter new username: [max 20]");   
+        JLabel lblPassword = new JLabel("Enter new password: [max 20]");
+        JLabel lblName=new JLabel("Enter name:");
+        txtUsername = new JTextField(20);
+        txtPassword = new JPasswordField(20);
+        txtName=new JTextField(30);
+        JButton btnRegister = new JButton("Register");
+        btnRegister.addActionListener(new RegisterListener());
+        JButton btnCancel = new JButton("Clear");
+        btnCancel.addActionListener(new CancelListener());
+        
+     
+ 
+        panel.add(lblUsername);
+        panel.add(txtUsername);
+        panel.add(lblPassword);
+        panel.add(txtPassword);
+        panel.add(lblName);
+        panel.add(txtName);
+
+        panel.add(btnRegister);
+        panel.add(btnCancel);         
+        frame.getContentPane().add(BorderLayout.CENTER,panel);
+        frame.getRootPane().setDefaultButton(btnRegister);
+        ImageIcon ficon=new ImageIcon("/home/ritom/Desktop/Java/DBMS/icon_cw.png");
+        frame.setIconImage(ficon.getImage());
+ 
+        frame.setSize(300,300);
+        //frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
+        //frame.setUndecorated(true);
+        frame.setVisible(true);
+    }
+
+    public class RegisterListener implements ActionListener{
+        public void actionPerformed(ActionEvent event){
+            try{
+            Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); 
+            Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
+            stmt=con.createStatement();
+            
+            String password=new String(txtPassword.getPassword());//get from window
+            stmt.executeUpdate("INSERT INTO users (uid,username,password,name) VALUES(null,'"+txtUsername.getText()+"','"+password+"','"+txtName.getText()+"');");
+            
+            con.close();
+            frame.dispose();
+            }
+            catch(SQLException e)
+            {
+                System.out.println("SQLException: " + e.getMessage());
+                
+                System.out.println("SQLState: " + e.getSQLState());
+                System.out.println("VendorError: " + e.getErrorCode());
+                
+                if(e.getErrorCode()==1062)
+                 JOptionPane.showMessageDialog(null,"Username exists","Alert",JOptionPane.ERROR_MESSAGE);
+                else
+                JOptionPane.showMessageDialog(null,"Error occurred. Please try again.","Alert",JOptionPane.ERROR_MESSAGE);
+            }
+            catch(Exception e)
+            {
+                System.out.println(e);
+            }
+            finally{
+                
+            if(stmt!=null)
+            {
+                try{
+                    stmt.close();
+                }
+                catch(SQLException sqlEx)
+                {
+
+                }
+                stmt=null;
+            }
+            }
+            
+                              
+        }
+    }
+    public class CancelListener implements ActionListener{
+        public void actionPerformed(ActionEvent event){
+            txtUsername.setText("");
+            txtPassword.setText("");
+            txtName.setText("");
+            txtUsername.requestFocus();
+        }
+    }
+    
 }
