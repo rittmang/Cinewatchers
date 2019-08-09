@@ -286,7 +286,8 @@ class Register
         ImageIcon ficon=new ImageIcon("/home/ritom/Desktop/Java/DBMS/icon_cw.png");
         frame.setIconImage(ficon.getImage());
  
-        frame.setSize(300,300);
+        frame.setSize(400,400);
+        frame.setResizable(false);
         //frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
         //frame.setUndecorated(true);
         frame.setVisible(true);
@@ -299,11 +300,15 @@ class Register
             Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
             stmt=con.createStatement();
             
-            String password=new String(txtPassword.getPassword());//get from window
-            stmt.executeUpdate("INSERT INTO users (uid,username,password,name) VALUES(null,'"+txtUsername.getText()+"','"+password+"','"+txtName.getText()+"');");
-            
-            con.close();
-            frame.dispose();
+            String password=new String(txtPassword.getPassword()).trim();//get from window
+            if(password.isEmpty() || txtUsername.getText().trim().isEmpty() || txtName.getText().trim().isEmpty())
+            {
+                JOptionPane.showMessageDialog(null,"Please fill all fields!","Alert",JOptionPane.ERROR_MESSAGE);
+            }
+            else
+               { stmt.executeUpdate("INSERT INTO users (uid,username,password,name) VALUES(null,'"+txtUsername.getText().trim()+"','"+password+"','"+txtName.getText().trim()+"');");
+                con.close();
+                frame.dispose();}
             }
             catch(SQLException e)
             {
