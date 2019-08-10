@@ -318,7 +318,7 @@ class Register
                 System.out.println("VendorError: " + e.getErrorCode());
                 
                 if(e.getErrorCode()==1062)
-                 JOptionPane.showMessageDialog(null,"Username exists","Alert",JOptionPane.ERROR_MESSAGE);
+                 JOptionPane.showMessageDialog(null,"Username already exists","Alert",JOptionPane.ERROR_MESSAGE);
                 else
                 JOptionPane.showMessageDialog(null,"Error occurred. Please try again.","Alert",JOptionPane.ERROR_MESSAGE);
             }
