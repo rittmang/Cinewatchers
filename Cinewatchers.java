@@ -1,7 +1,13 @@
 import javax.swing.*;
 import javax.swing.BorderFactory;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.Box;
 
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.BorderLayout;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.Statement;
@@ -64,6 +70,9 @@ public class Cinewatchers{
             try{
             Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); 
             Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
+            //Connection con=DriverManager.getConnection("jdbc:mysql://rightonrittman.mysql.database.azure.com:3306/cinewatchers?useSSL=true&requireSSL=false","jumperwire@rightonrittman","123123123a!");
+            //Connection con=DriverManager.getConnection("jdbc:mysql://cinewatchers2.mysql.database.azure.com:3306/cinewatchers?useSSL=true&requireSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC","thisissmall@cinewatchers2","123123123a!");
+            
             stmt=con.createStatement();
             rs=stmt.executeQuery("SELECT * FROM users");
             String password=new String(txtPassword.getPassword());//get from window
@@ -84,6 +93,7 @@ public class Cinewatchers{
                          Home h=new Home();
                          h.go(frame,uid,username,name);
                          signed_in=1;
+                         System.out.println("Logged In");
                      }
                  } 
             }
@@ -100,6 +110,8 @@ public class Cinewatchers{
             catch(Exception e)
             {
                 System.out.println(e);
+                e.printStackTrace();
+                System.out.println("Something went wrong");
             }
             finally{
                 if(rs!=null)
@@ -160,21 +172,49 @@ class Home
         user_name=username;
         name=n;
         new_frame=frame;
+        Box box = Box.createHorizontalBox();
+        box.setBorder(new EmptyBorder(0, 0, 0, 0));
+        Box box1 = Box.createHorizontalBox();
+        box1.setBorder(new EmptyBorder(0, 0, 0, 0));
         JLabel l=new JLabel();
         l.setText("Welcome to Cinewatchers, "+name);
-        l.setHorizontalAlignment(JLabel.CENTER);
+        //l.setHorizontalAlignment(JLabel.CENTER);
+        //l.setAlignmentX(p.CENTER_ALIGNMENT);
         p=new JPanel();
+        
+        //p.setBorder(new EmptyBorder(new Insets(100, 150, 100, 150)));
+        //p.setBorder(BorderFactory.createTitledBorder("Home"));
+        TitledBorder border = new TitledBorder("Home");
+        border.setTitleJustification(TitledBorder.CENTER);
+        border.setTitlePosition(TitledBorder.TOP);
         p.setLayout(new BoxLayout(p,BoxLayout.Y_AXIS));
-        p.add(l);
-        new_frame.add(p);
-        new_frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        p.setBorder(border);
+        p.add(Box.createRigidArea(new Dimension(0, 40)));
+        //p.add(l);
+        box1.add(l);
+        p.add(box1);
+        p.add(Box.createRigidArea(new Dimension(0, 30)));
+        
         JButton btnShowReviews = new JButton("Show my reviews");
         btnShowReviews.addActionListener(new ShowReviewsListener());
-        p.add(btnShowReviews);
+        
+        JButton btnShowMovies = new JButton("Show movie database");
+        //btnShowMovies.addActionListener(new ShowMoviesListener());
+        //box.add(l);
+        box.add(btnShowReviews);
+        box.add(Box.createRigidArea(new Dimension (50,10)));
+        box.add(btnShowMovies);
+        p.add(box);
+        p.add(Box.createRigidArea(new Dimension(0, 80)));
+        //p.add(btnShowReviews);
+        //p.add(btnShowMovies);
+        //p.add(Box.createRigidArea(new Dimension(0, 80)));
         //System.out.println(all_reviews);
         //rev.setText(all_reviews);
         //p.add(rev);
-        new_frame.getContentPane().add(BorderLayout.CENTER,p);
+        //new_frame.getContentPane().add(BorderLayout.CENTER,p);
+        new_frame.add(p);
+        new_frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         new_frame.setVisible(true);
 
     }
@@ -191,14 +231,14 @@ class Home
             Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); 
             Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
             stmt=con.createStatement();
-            rs=stmt.executeQuery("SELECT * FROM reviews WHERE uid="+user_id);
+            rs=stmt.executeQuery("SELECT * FROM reviews WHERE userid="+user_id);
             
             rev=new JLabel();
             
 
             while(rs.next())
             {
-                all_reviews+=rs.getString(3)+"\n\n";    
+                all_reviews+=rs.getString(5)+"\n\n";    
             }
             
             rev.setText("<html>"+all_reviews.replaceAll("<","&lt;").replaceAll(">", "&gt;").replaceAll("\n","<br />")+"</html>");
@@ -206,7 +246,8 @@ class Home
             rev.setVerticalAlignment(JLabel.CENTER);
             Border border = BorderFactory.createLineBorder(Color.BLACK);
             rev.setBorder(border);
-            p.add(rev);
+            Box box = Box.createHorizontalBox();box.add(rev);
+            p.add(box);
             new_frame.validate();
             new_frame.repaint();
             already_shown=1;

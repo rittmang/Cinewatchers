@@ -1,0 +1,28 @@
+create table person(pid int primary key auto_increment, name varchar(30) not null,born date not null,died date default null);
+
+create table genre(glabel varchar(20) not null primary key);
+
+user is same table
+
+create table movie(mid int primary key auto_increment, name varchar(30) not null, year int not null, image blob);
+
+create table worked_as(movieid int not null,personid int not null, foreign key (movieid) references movie(mid), foreign key (personid) references person(pid),job enum('Cast','Director','Producer') not null); 
+
+
+create table comes_in(movieid int not null, mgenre varchar(20) not null,foreign key(movieid) references movie(mid),foreign key(mgenre) references genre(glabel),primary key(movieid,mgenre));
+
+create table stars_allowed(val int primary key);
+
+mysql> desc users;
++----------+-------------+------+-----+---------+----------------+
+| Field    | Type        | Null | Key | Default | Extra          |
++----------+-------------+------+-----+---------+----------------+
+| uid      | int(11)     | NO   | PRI | NULL    | auto_increment |
+| username | char(20)    | NO   | UNI | NULL    |                |
+| password | char(20)    | NO   |     | NULL    |                |
+| name     | varchar(40) | NO   |     | NULL    |                |
++----------+-------------+------+-----+---------+----------------+
+
+create table reviews(reviewid int primary key auto_increment,movieid int not null,userid int not null, stars int not null, text varchar(120) not null,foreign key (movieid) references movie(mid),foreign key (userid) references users(uid),foreign key (stars) references stars_allowed(val));
+
+insert into genre values('Adventure'),('Comedy'),('Crime'),('Drama'),('Fantasy'),('Historical'),('Historical fiction'),('Horror'),('Magical realism'),('Mystery'),('Paranoid fiction'),('Philosophical'),('Political'),('Romance'),('Saga'),('Satire'),('Science fiction'),('Social'),('Speculative'),('Thriller'),('urban'),('Western');
