@@ -4,10 +4,12 @@ import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.Box;
+import javax.imageio.ImageIO;
 
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.BorderLayout;
+import java.awt.image.BufferedImage;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.Statement;
@@ -43,7 +45,7 @@ public class Cinewatchers{
         btnCancel.addActionListener(new CancelListener());
         JButton btnRegister = new JButton("Register");//basically add new user
         btnRegister.addActionListener(new RegisterListener());
-        JButton btnAdmin = new JButton("Admin Login");
+        JButton btnAdmin = new JButton("I'm an Admin");
         btnAdmin.addActionListener(new AdminListener());     
  
         panel.add(lblUsername);
@@ -176,7 +178,7 @@ class Home
 {
     
     String user_id="",user_name="",name="";
-    JPanel p;JLabel rev;String all_reviews="";
+    JPanel p;JLabel rev;String all_reviews="",all_movies="";
     JFrame new_frame;int already_shown=0;
     public void go(JFrame frame,String uid,String username,String n)//uses same frame from Cinewatchers class
     {
@@ -211,7 +213,7 @@ class Home
         btnShowReviews.addActionListener(new ShowReviewsListener());
         
         JButton btnShowMovies = new JButton("Show movie database");
-        //btnShowMovies.addActionListener(new ShowMoviesListener());
+        btnShowMovies.addActionListener(new ShowMoviesListener());
         //box.add(l);
         box.add(btnShowReviews);
         box.add(Box.createRigidArea(new Dimension (50,10)));
@@ -225,7 +227,9 @@ class Home
         //rev.setText(all_reviews);
         //p.add(rev);
         //new_frame.getContentPane().add(BorderLayout.CENTER,p);
-        new_frame.add(p);
+        JScrollPane pane = new JScrollPane(p,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        pane.getVerticalScrollBar().setUnitIncrement(16);
+        new_frame.add(pane);
         new_frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         new_frame.setVisible(true);
 
@@ -291,6 +295,115 @@ class Home
             }
         }
            //JOptionPane.showMessageDialog(null,msg,"Alert",JOptionPane.);
+                              
+        }
+    }
+    public class ShowMoviesListener implements ActionListener{
+        public void actionPerformed(ActionEvent event){
+            Statement stmt=null,stmt2=null;
+            ResultSet rs=null,rs2=null;
+            if(already_shown==1)
+            {
+                already_shown=0;
+                //p.removeAll();
+                p = new JPanel();
+                new_frame.revalidate();new_frame.repaint();
+                new_frame.removeAll();
+                new_frame.dispose();
+                AdminHome h = new AdminHome();
+                
+                JFrame q = new JFrame("Cinewatchers Administrator Window");
+                ImageIcon ficon=new ImageIcon("/home/ritom/Desktop/Java/DBMS/icon_cw.png");
+                q.setIconImage(ficon.getImage());
+                q.setTitle("Cinewatchers Administrator");
+                q.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                h.go(q,user_id,user_name);
+                //JOptionPane.showMessageDialog(null,"All movies done","Alert",JOptionPane.INFORMATION_MESSAGE);
+            }
+            else{
+            try{
+            Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); 
+            Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
+            stmt=con.createStatement();stmt2=con.createStatement();
+            rs=stmt.executeQuery("SELECT * FROM movie");
+            rs2=stmt2.executeQuery("SELECT COUNT(1) FROM movie");rs2.next();int number = rs2.getInt(1);
+            Box full = Box.createVerticalBox();
+            Box row = Box.createHorizontalBox();
+            int counter=0;
+            while(rs.next())
+            {
+                rev=new JLabel();
+                rev.setMinimumSize(new Dimension(500,100));
+                rev.setMaximumSize(new Dimension(500,100));
+                rev.setPreferredSize(new Dimension(500,100));
+                all_movies=rs.getString(2)+"\t\t\t"+rs.getInt(3)+"\n\n";
+                rev.setText("<html>"+all_movies.replaceAll("<","&lt;").replaceAll(">", "&gt;").replaceAll("\n","<br />").replaceAll("\t","&nbsp;&nbsp;&nbsp;&nbsp;")+"</html>");
+                rev.setHorizontalAlignment(JLabel.CENTER);
+                rev.setVerticalAlignment(JLabel.CENTER);
+                //Border border = BorderFactory.createLineBorder(Color.LIGHT_GRAY);
+                Border border = BorderFactory.createLineBorder(new Color(220,220,220));
+                rev.setBorder(border);
+                
+                BufferedImage im = ImageIO.read(rs.getBinaryStream("Image"));
+                Image dimg = im.getScaledInstance(36, 64, Image.SCALE_SMOOTH);
+                rev.setIcon(new ImageIcon(dimg));
+                System.out.println(counter);
+                if(counter%2==0)//issue is, if counter is even above 2, and that's the last movie, won't add to p. Ensure even number of movies for now
+                {
+                    row.add(rev);
+                    
+                }
+                else{ 
+                    row.add(rev);
+                    full.add(row);
+                    p.add(full);
+                    row = Box.createHorizontalBox();
+                    full = Box.createVerticalBox();
+                }
+                counter++;   
+            }
+            if(counter%2 != 0 && number%2!=0)
+            {
+                full.add(row);
+                p.add(full);
+                row = Box.createHorizontalBox();
+                full = Box.createVerticalBox();
+                
+            }
+            //full.add(box);
+            //p.add(full);
+            new_frame.validate();
+            new_frame.repaint();
+            already_shown=1;
+            con.close();
+            }
+            catch(SQLException e)
+            {
+                System.out.println("SQLException: " + e.getMessage());
+                System.out.println("SQLState: " + e.getSQLState());
+                System.out.println("VendorError: " + e.getErrorCode());
+                System.out.println(e);
+            }
+            catch(Exception e)
+            {
+                System.out.println(e);
+            }
+            finally{
+                if(rs!=null)
+            {
+                try{rs.close();}
+                catch(SQLException sqlEx){}
+                rs=null;
+            }
+            if(stmt!=null)
+            {
+                try{stmt.close();}
+                catch(SQLException sqlEx){}
+                stmt=null;
+            }
+            }
+        }
+           // JOptionPane.showMessageDialog(null,msg,"Alert",JOptionPane.INFORMATION_MESSAGE);
                               
         }
     }

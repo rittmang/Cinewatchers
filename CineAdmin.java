@@ -49,14 +49,17 @@ public class CineAdmin{
         btnLogin.addActionListener(new LoginListener());
         JButton btnCancel = new JButton("Cancel");
         btnCancel.addActionListener(new CancelListener());
-     
+        JButton btnUser = new JButton("I'm a User");
+        btnUser.addActionListener(new UserListener());
  
         panel.add(lblUsername);
         panel.add(txtUsername);
         panel.add(lblPassword);
         panel.add(txtPassword);
         panel.add(btnLogin);
-        panel.add(btnCancel);         
+        panel.add(btnCancel);
+        panel.add(btnUser);
+        
         frame.getContentPane().add(BorderLayout.CENTER,panel);
         frame.getRootPane().setDefaultButton(btnLogin);
         ImageIcon ficon=new ImageIcon("/home/ritom/Desktop/Java/DBMS/icon_cw.png");
@@ -154,6 +157,13 @@ public class CineAdmin{
             txtUsername.requestFocus();
         }
     }
+    public class UserListener implements ActionListener{
+        public void actionPerformed(ActionEvent event){
+            Cinewatchers r=new Cinewatchers();
+            frame.dispose();
+            r.go();
+        }
+    }
 }
 class AdminHome{
     
@@ -193,9 +203,13 @@ class AdminHome{
         JButton btnShowMovies = new JButton("Show movie database");
         JButton btnAddMovies = new JButton("Add movie");
         JButton btnAddGenre = new JButton("Add genre");
+        JButton btnRefresh = new JButton("Refresh");
+        JButton btnLogout = new JButton("Log out");
         btnShowMovies.addActionListener(new ShowMoviesListener());
         btnAddMovies.addActionListener(new AddMoviesListener());
         btnAddGenre.addActionListener(new AddGenreListener());
+        btnRefresh.addActionListener(new RefreshListener());
+        btnLogout.addActionListener(new LogoutListener());
         //box.add(l);
         box.add(btnShowReviews);
         box.add(Box.createRigidArea(new Dimension (50,10)));
@@ -204,10 +218,15 @@ class AdminHome{
         box.add(btnAddMovies);
         box.add(Box.createRigidArea(new Dimension (50,10)));
         box.add(btnAddGenre);
+        box.add(Box.createRigidArea(new Dimension (50,10)));
+        box.add(btnRefresh);
+        box.add(Box.createRigidArea(new Dimension (50,10)));
+        box.add(btnLogout);
         p.add(box);
         p.add(Box.createRigidArea(new Dimension(0, 80)));
-    
-        new_frame.add(p);
+        JScrollPane pane = new JScrollPane(p,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        pane.getVerticalScrollBar().setUnitIncrement(16);
+        new_frame.add(pane);//changed from p
         new_frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         new_frame.setVisible(true);
 
@@ -287,6 +306,8 @@ class AdminHome{
                 AdminHome h = new AdminHome();
                 
                 JFrame q = new JFrame("Cinewatchers Administrator Window");
+                ImageIcon ficon=new ImageIcon("/home/ritom/Desktop/Java/DBMS/icon_cw.png");
+                q.setIconImage(ficon.getImage());
                 q.setTitle("Cinewatchers Administrator");
                 q.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 h.go(q,user_id,user_name);
@@ -390,6 +411,29 @@ class AdminHome{
         public void actionPerformed(ActionEvent event){
             //btnAddMovies.requestFocus();
             AddGenre r=new AddGenre();
+            r.go();
+        }
+    }
+    public class RefreshListener implements ActionListener{
+        public void actionPerformed(ActionEvent event){
+            //btnAddMovies.requestFocus();
+            new_frame.removeAll();
+            new_frame.dispose();
+            AdminHome h = new AdminHome();
+                
+            JFrame q = new JFrame("Cinewatchers Administrator Window");
+            ImageIcon ficon=new ImageIcon("/home/ritom/Desktop/Java/DBMS/icon_cw.png");
+            q.setIconImage(ficon.getImage());
+            q.setTitle("Cinewatchers Administrator");
+            q.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            h.go(q,user_id,user_name);
+        }
+    }
+    public class LogoutListener implements ActionListener{
+        public void actionPerformed(ActionEvent event){
+            //btnAddMovies.requestFocus();
+            CineAdmin r=new CineAdmin();
+            new_frame.dispose();
             r.go();
         }
     }
@@ -625,52 +669,40 @@ class AddGenre
 
     public class AddToDBListener implements ActionListener{
         public void actionPerformed(ActionEvent event){
-
+            String naam="",naam2="",gaanre="";
             try{
                 //get input from JComboBox
-                String naam=(String)movie_name.getEditor().getItem();
-                String gaanre = (String)genre.getEditor().getItem();
+                naam=(String)movie_name.getSelectedItem();
+                
+                naam2=naam.substring(0,naam.indexOf("("));//System.out.println("Name="+naam);
+                gaanre = (String)genre.getSelectedItem();
                 int mid=0;
                 Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); 
                 Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
                 Statement stmt=con.createStatement();
-                ResultSet rs=stmt.executeQuery("SELECT year FROM movie WHERE name="+naam);
+                ResultSet rs=stmt.executeQuery("SELECT year FROM movie WHERE name="+"'"+naam2+"'");
                 while(rs.next())
                 {
                     int year=rs.getInt(1);
+                    //System.out.println(year);
                     if(naam.contains(year+""))//considering that 1 name movie in 1 year
                     {
                         Statement stmt2 = con.createStatement();
-                        ResultSet rs2 = stmt2.executeQuery("SELECT mid FROM movie WHERE name="+naam+" AND year="+year);
+                        ResultSet rs2 = stmt2.executeQuery("SELECT mid FROM movie WHERE name='"+naam2+"' AND year="+year);
                         rs2.next();
                         mid=rs2.getInt(1);
                     }
                 }
-                if(mid == 0){throw new Exception("Umm, what happened again?");}                
+                //if(mid == 0){throw new Exception("Umm, what happened again?");}                
                 
                 //add COMES_IN LOGIC HERE::::::::::::::::::::::::::::::::::::::::::::::::::::::>>>>>>>>>>>>>
-                Statement stmt2=con.createStatement();
-                ResultSet rs2=stmt.executeQuery("SELECT mid FROM genre WHERE name="+naam);          
+                Connection con2=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
+                Statement stmt2=con2.createStatement();
+                //System.out.println("INSERT INTO comes_in VALUES("+mid+","+"'"+gaanre+"');");            
+                stmt2.executeUpdate("INSERT INTO comes_in VALUES("+mid+","+"'"+gaanre+"');");
+                con2.close();
+                frame.dispose();
                 
-                //NOW ADD INTO COMES_IN
-                
-                
-                
-                
-                
-                PreparedStatement ps=con.prepareStatement("INSERT INTO movie VALUES(?,?,?,?)");//for executing update, comes later
-                
-                
-                // InputStream is = new FileInputStream(new File(s));
-                // ps.setNull(1, java.sql.Types.INTEGER);
-                // ps.setString(2, txtName.getText());
-                // ps.setInt(3,Integer.parseInt(txtYear.getText()));
-                // ps.setBlob(4, is);
-                // ps.executeUpdate();
-                // JOptionPane.showMessageDialog(null, "Data inserted successfully", "Alert", JOptionPane.INFORMATION_MESSAGE);
-                // //already_shown = 0;
-                // con.close();
-                // frame.dispose();
 
             }
             catch(SQLException e)
@@ -678,9 +710,11 @@ class AddGenre
                 System.out.println("SQLException: " + e.getMessage());
                 System.out.println("SQLState: " + e.getSQLState());
                 System.out.println("VendorError: " + e.getErrorCode());
-                if(e.getErrorCode()==1406)
+                //e.getCause().getStackTrace();
+                e.printStackTrace();
+                if(e.getErrorCode()==1062)
                 {
-                    JOptionPane.showMessageDialog(null, "Image is too big. Please keep within 65 kB", "Alert", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, naam+" is already tagged "+gaanre, "Alert", JOptionPane.ERROR_MESSAGE);
                 }
             }
             catch(Exception e)
