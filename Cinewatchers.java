@@ -214,19 +214,22 @@ class Home
         
         JButton btnShowMovies = new JButton("Show movie database");
         btnShowMovies.addActionListener(new ShowMoviesListener());
+        JButton btnRefresh = new JButton("Refresh");
+        btnRefresh.addActionListener(new RefreshListener());
+        JButton btnLogout = new JButton("Logout");
+        btnLogout.addActionListener(new LogoutListener());
+        
         //box.add(l);
         box.add(btnShowReviews);
         box.add(Box.createRigidArea(new Dimension (50,10)));
         box.add(btnShowMovies);
+        box.add(Box.createRigidArea(new Dimension (50,10)));
+        box.add(btnRefresh);
+        box.add(Box.createRigidArea(new Dimension (50,10)));
+        box.add(btnLogout);
         p.add(box);
         p.add(Box.createRigidArea(new Dimension(0, 80)));
-        //p.add(btnShowReviews);
-        //p.add(btnShowMovies);
-        //p.add(Box.createRigidArea(new Dimension(0, 80)));
-        //System.out.println(all_reviews);
-        //rev.setText(all_reviews);
-        //p.add(rev);
-        //new_frame.getContentPane().add(BorderLayout.CENTER,p);
+        
         JScrollPane pane = new JScrollPane(p,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         pane.getVerticalScrollBar().setUnitIncrement(16);
         new_frame.add(pane);
@@ -294,7 +297,7 @@ class Home
             }
             }
         }
-           //JOptionPane.showMessageDialog(null,msg,"Alert",JOptionPane.);
+           
                               
         }
     }
@@ -310,14 +313,14 @@ class Home
                 new_frame.revalidate();new_frame.repaint();
                 new_frame.removeAll();
                 new_frame.dispose();
-                AdminHome h = new AdminHome();
+                Home h = new Home();
                 
                 JFrame q = new JFrame("Cinewatchers Administrator Window");
                 ImageIcon ficon=new ImageIcon("/home/ritom/Desktop/Java/DBMS/icon_cw.png");
                 q.setIconImage(ficon.getImage());
                 q.setTitle("Cinewatchers Administrator");
                 q.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-                h.go(q,user_id,user_name);
+                h.go(q,user_id,user_name,name);
                 //JOptionPane.showMessageDialog(null,"All movies done","Alert",JOptionPane.INFORMATION_MESSAGE);
             }
             else{
@@ -405,6 +408,29 @@ class Home
         }
            // JOptionPane.showMessageDialog(null,msg,"Alert",JOptionPane.INFORMATION_MESSAGE);
                               
+        }
+    }
+    public class RefreshListener implements ActionListener{
+        public void actionPerformed(ActionEvent event){
+            //btnAddMovies.requestFocus();
+            new_frame.removeAll();
+            new_frame.dispose();
+            Home h = new Home();
+                
+            JFrame q = new JFrame("Cinewatchers");
+            ImageIcon ficon=new ImageIcon("/home/ritom/Desktop/Java/DBMS/icon_cw.png");
+            q.setIconImage(ficon.getImage());
+            q.setTitle("Cinewatchers");
+            q.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            h.go(q,user_id,user_name,name);
+        }
+    }
+    public class LogoutListener implements ActionListener{
+        public void actionPerformed(ActionEvent event){
+            //btnAddMovies.requestFocus();
+            Cinewatchers r=new Cinewatchers();
+            new_frame.dispose();
+            r.go();
         }
     }
 
