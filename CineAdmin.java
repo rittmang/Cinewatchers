@@ -294,7 +294,7 @@ class AdminHome{
     public class ShowMoviesListener implements ActionListener{
         public void actionPerformed(ActionEvent event){
             Statement stmt=null,stmt2=null;
-            ResultSet rs=null,rs2=null;
+            ResultSet rs=null,rs2=null,rs3=null;
             if(already_shown==1)
             {
                 already_shown=0;
@@ -330,6 +330,17 @@ class AdminHome{
                 rev.setMaximumSize(new Dimension(500,100));
                 rev.setPreferredSize(new Dimension(500,100));
                 all_movies=rs.getString(2)+"\t\t\t"+rs.getInt(3)+"\n\n";
+                int mid=rs.getInt(1);
+                Statement stmt3=con.createStatement();
+                rs3=stmt3.executeQuery("SELECT mgenre FROM comes_in WHERE movieid="+mid);
+                while(rs3.next())
+                {
+                    
+                    all_movies+=rs3.getString(1);
+                    if(!rs3.isLast())
+                        all_movies+=", ";
+                }
+                //all_movies+="\b";
                 rev.setText("<html>"+all_movies.replaceAll("<","&lt;").replaceAll(">", "&gt;").replaceAll("\n","<br />").replaceAll("\t","&nbsp;&nbsp;&nbsp;&nbsp;")+"</html>");
                 rev.setHorizontalAlignment(JLabel.CENTER);
                 rev.setVerticalAlignment(JLabel.CENTER);
@@ -562,6 +573,10 @@ class AddMovies
                 {
                     JOptionPane.showMessageDialog(null, "Image is too big. Please keep within 65 kB", "Alert", JOptionPane.ERROR_MESSAGE);
                 }
+                if(e.getErrorCode()==1062)
+                {
+                    JOptionPane.showMessageDialog(null, "Duplicate entry found. Cinewatchers cannot support duplicate (name,year) pairs in this version.", "Alert", JOptionPane.ERROR_MESSAGE);
+                }
             }
             catch(NumberFormatException e)
             {
@@ -626,7 +641,7 @@ class AddGenre
             Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
             Statement stmt=con.createStatement();Statement stmt2=con.createStatement();
             ResultSet rs=stmt.executeQuery("SELECT * FROM genre");
-            ResultSet rs2=stmt2.executeQuery("SELECT name,year FROM movie");
+            ResultSet rs2=stmt2.executeQuery("SELECT name,year FROM movie ORDER BY year DESC");
             while(rs2.next())
             {
                 movie_name.addItem(rs2.getString(1)+" ("+rs2.getInt(2)+")");    
