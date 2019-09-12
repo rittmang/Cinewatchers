@@ -43,7 +43,8 @@ public class Cinewatchers{
         btnCancel.addActionListener(new CancelListener());
         JButton btnRegister = new JButton("Register");//basically add new user
         btnRegister.addActionListener(new RegisterListener());
-     
+        JButton btnAdmin = new JButton("Admin Login");
+        btnAdmin.addActionListener(new AdminListener());     
  
         panel.add(lblUsername);
         panel.add(txtUsername);
@@ -51,7 +52,8 @@ public class Cinewatchers{
         panel.add(txtPassword);
         panel.add(btnLogin);
         panel.add(btnCancel);
-        panel.add(btnRegister);         
+        panel.add(btnRegister);
+        panel.add(btnAdmin);
         frame.getContentPane().add(BorderLayout.CENTER,panel);
         frame.getRootPane().setDefaultButton(btnLogin);
         ImageIcon ficon=new ImageIcon("/home/ritom/Desktop/Java/DBMS/icon_cw.png");
@@ -155,6 +157,16 @@ public class Cinewatchers{
             txtPassword.setText("");
             txtUsername.requestFocus();
             Register r=new Register();
+            r.go();
+        }
+    }
+    public class AdminListener implements ActionListener{
+        public void actionPerformed(ActionEvent event){
+            //txtUsername.setText("");
+            //txtPassword.setText("");
+            //txtUsername.requestFocus();
+            CineAdmin r=new CineAdmin();
+            frame.dispose();
             r.go();
         }
     }
@@ -278,7 +290,7 @@ class Home
             }
             }
         }
-           // JOptionPane.showMessageDialog(null,msg,"Alert",JOptionPane.INFORMATION_MESSAGE);
+           //JOptionPane.showMessageDialog(null,msg,"Alert",JOptionPane.);
                               
         }
     }

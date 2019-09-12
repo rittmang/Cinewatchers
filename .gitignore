@@ -1,1 +1,4 @@
 *.class
+search.java
+SQLConnection.java
+gui.java

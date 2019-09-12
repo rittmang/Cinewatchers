@@ -26,3 +26,7 @@ mysql> desc users;
 create table reviews(reviewid int primary key auto_increment,movieid int not null,userid int not null, stars int not null, text varchar(120) not null,foreign key (movieid) references movie(mid),foreign key (userid) references users(uid),foreign key (stars) references stars_allowed(val));
 
 insert into genre values('Adventure'),('Comedy'),('Crime'),('Drama'),('Fantasy'),('Historical'),('Historical fiction'),('Horror'),('Magical realism'),('Mystery'),('Paranoid fiction'),('Philosophical'),('Political'),('Romance'),('Saga'),('Satire'),('Science fiction'),('Social'),('Speculative'),('Thriller'),('urban'),('Western');
+
+create table admin(aid int primary key auto_increment,uname char(20) unique not null,pword char(20) not null);
+
+insert into admin values(null,'admin','admin');
