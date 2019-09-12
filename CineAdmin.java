@@ -164,7 +164,7 @@ class AdminHome{
     {
         user_id=uid;
         user_name=username;
-        
+        System.out.println(user_name+" is on Home page");
         new_frame=frame;
         Box box = Box.createHorizontalBox();
         box.setBorder(new EmptyBorder(0, 0, 0, 0));
@@ -282,6 +282,14 @@ class AdminHome{
                 //p.removeAll();
                 p = new JPanel();
                 new_frame.revalidate();new_frame.repaint();
+                new_frame.removeAll();
+                new_frame.dispose();
+                AdminHome h = new AdminHome();
+                
+                JFrame q = new JFrame("Cinewatchers Administrator Window");
+                q.setTitle("Cinewatchers Administrator");
+                q.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                h.go(q,user_id,user_name);
                 //JOptionPane.showMessageDialog(null,"All movies done","Alert",JOptionPane.INFORMATION_MESSAGE);
             }
             else{
