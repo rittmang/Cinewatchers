@@ -1,20 +1,26 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.BorderFactory;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.Box;
-import javax.imageio.ImageIO;
 
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.BorderLayout;
-import java.awt.image.BufferedImage;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
  //add new user (Register) in SQL table: insert into users (username,password,name) values ('ritom','ritom','Ritom');
@@ -209,6 +215,8 @@ class Home
         p.add(box1);
         p.add(Box.createRigidArea(new Dimension(0, 30)));
         
+        JButton btnAddReview = new JButton("Add Review");
+        btnAddReview.addActionListener(new AddReviewListener());
         JButton btnShowReviews = new JButton("Show my reviews");
         btnShowReviews.addActionListener(new ShowReviewsListener());
         
@@ -220,6 +228,8 @@ class Home
         btnLogout.addActionListener(new LogoutListener());
         
         //box.add(l);
+        box.add(btnAddReview);
+        box.add(Box.createRigidArea(new Dimension (50,10)));
         box.add(btnShowReviews);
         box.add(Box.createRigidArea(new Dimension (50,10)));
         box.add(btnShowMovies);
@@ -230,7 +240,7 @@ class Home
         p.add(box);
         p.add(Box.createRigidArea(new Dimension(0, 80)));
         
-        JScrollPane pane = new JScrollPane(p,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        JScrollPane pane = new JScrollPane(p,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         pane.getVerticalScrollBar().setUnitIncrement(16);
         new_frame.add(pane);
         new_frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -243,7 +253,20 @@ class Home
             ResultSet rs=null;
             if(already_shown==1)
             {
-                JOptionPane.showMessageDialog(null,"All reviews done","Alert",JOptionPane.INFORMATION_MESSAGE);
+                already_shown=0;
+                //p.removeAll();
+                p = new JPanel();
+                new_frame.revalidate();new_frame.repaint();
+                new_frame.removeAll();
+                new_frame.dispose();
+                Home h = new Home();
+                
+                JFrame q = new JFrame("Cinewatchers");
+                ImageIcon ficon=new ImageIcon("/home/ritom/Desktop/Java/DBMS/icon_cw.png");
+                q.setIconImage(ficon.getImage());
+                q.setTitle("Cinewatchers");
+                q.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                h.go(q,user_id,user_name,name);
             }
             else{
             try{
@@ -252,20 +275,22 @@ class Home
             stmt=con.createStatement();
             rs=stmt.executeQuery("SELECT * FROM reviews WHERE userid="+user_id);
             
-            rev=new JLabel();
             
+            Box box2 = Box.createVerticalBox();
 
             while(rs.next())
             {
-                all_reviews+=rs.getString(5)+"\n\n";    
-            }
-            
-            rev.setText("<html>"+all_reviews.replaceAll("<","&lt;").replaceAll(">", "&gt;").replaceAll("\n","<br />")+"</html>");
-            rev.setHorizontalAlignment(JLabel.CENTER);
+                rev=new JLabel();
+                all_reviews=rs.getString(5)+"\n\n";
+                rev.setText("<html><div style=\"width:100%;\">"+all_reviews.replaceAll("<","&lt;").replaceAll(">", "&gt;").replaceAll("\n","<br />")+"</html>");
+            rev.setHorizontalAlignment(JLabel.LEFT);
             rev.setVerticalAlignment(JLabel.CENTER);
             Border border = BorderFactory.createLineBorder(Color.BLACK);
-            rev.setBorder(border);
-            Box box = Box.createHorizontalBox();box.add(rev);
+            rev.setBorder(border); 
+            box2.add(rev);
+            
+            }
+            
             p.add(box);
             new_frame.validate();
             new_frame.repaint();
@@ -304,7 +329,7 @@ class Home
     public class ShowMoviesListener implements ActionListener{
         public void actionPerformed(ActionEvent event){
             Statement stmt=null,stmt2=null;
-            ResultSet rs=null,rs2=null;
+            ResultSet rs=null,rs2=null,rs3=null;
             if(already_shown==1)
             {
                 already_shown=0;
@@ -315,10 +340,10 @@ class Home
                 new_frame.dispose();
                 Home h = new Home();
                 
-                JFrame q = new JFrame("Cinewatchers Administrator Window");
+                JFrame q = new JFrame("Cinewatchers");
                 ImageIcon ficon=new ImageIcon("/home/ritom/Desktop/Java/DBMS/icon_cw.png");
                 q.setIconImage(ficon.getImage());
-                q.setTitle("Cinewatchers Administrator");
+                q.setTitle("Cinewatchers");
                 q.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
                 h.go(q,user_id,user_name,name);
                 //JOptionPane.showMessageDialog(null,"All movies done","Alert",JOptionPane.INFORMATION_MESSAGE);
@@ -340,8 +365,19 @@ class Home
                 rev.setMaximumSize(new Dimension(500,100));
                 rev.setPreferredSize(new Dimension(500,100));
                 all_movies=rs.getString(2)+"\t\t\t"+rs.getInt(3)+"\n\n";
+                int mid=rs.getInt(1);
+                Statement stmt3=con.createStatement();
+                rs3=stmt3.executeQuery("SELECT mgenre FROM comes_in WHERE movieid="+mid);
+                while(rs3.next())
+                {
+                    
+                    all_movies+=rs3.getString(1);
+                    if(!rs3.isLast())
+                        all_movies+=", ";
+                }
+                //all_movies+="\b";
                 rev.setText("<html>"+all_movies.replaceAll("<","&lt;").replaceAll(">", "&gt;").replaceAll("\n","<br />").replaceAll("\t","&nbsp;&nbsp;&nbsp;&nbsp;")+"</html>");
-                rev.setHorizontalAlignment(JLabel.CENTER);
+                rev.setHorizontalAlignment(JLabel.LEFT);
                 rev.setVerticalAlignment(JLabel.CENTER);
                 //Border border = BorderFactory.createLineBorder(Color.LIGHT_GRAY);
                 Border border = BorderFactory.createLineBorder(new Color(220,220,220));
@@ -432,6 +468,14 @@ class Home
             new_frame.dispose();
             r.go();
         }
+    }
+    public class AddReviewListener implements ActionListener{
+        public void actionPerformed(ActionEvent event){
+
+            AddReview r = new AddReview();
+            r.go(user_id);
+        } 
+            
     }
 
 }
@@ -543,6 +587,159 @@ class Register
             txtName.setText("");
             txtUsername.requestFocus();
         }
+    }
+    
+}
+class AddReview
+{
+    String msg = "",s="",user_id="";
+    JComboBox<String> movie_name=null;
+    JComboBox<Integer> rating_stars=null;
+    JTextArea review = null;
+    JFrame frame;
+    Box box;
+    //int already_shown;
+    public void go(String user_id)
+    {
+        //already_shown = as;
+        this.user_id=user_id;
+        frame = new JFrame("CW - Add Review");
+        frame.setTitle("CW - Add Review");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        JPanel panel = new JPanel();
+        JLabel lblName = new JLabel("Choose Movie:");   
+        JLabel lblRating = new JLabel("Choose Rating(1-5): ");
+        JLabel lblReview = new JLabel("Enter review:");
+
+        box = Box.createVerticalBox();
+        box.setBorder(new EmptyBorder(0, 0, 0, 0));
+        Box box1 = Box.createHorizontalBox();
+        box1.setBorder(new EmptyBorder(0,0,0,0));
+        
+        movie_name = new JComboBox<>();//JComboBox is now Generic, apparently
+        rating_stars = new JComboBox<>();
+        review = new JTextArea(10, 10);
+        review.setLineWrap(true);
+        review.setWrapStyleWord(true);
+        try{
+            //add code to fill genre and movie_name stuff
+            Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
+            Statement stmt=con.createStatement();Statement stmt2=con.createStatement();
+            ResultSet rs=stmt.executeQuery("SELECT * FROM stars_allowed GROUP BY val ORDER BY val DESC;");
+            ResultSet rs2=stmt2.executeQuery("SELECT name,year FROM movie ORDER BY year DESC;");
+            while(rs2.next())
+            {
+                movie_name.addItem(rs2.getString(1)+" ("+rs2.getInt(2)+")");    
+            }
+            while(rs.next())
+            {
+                rating_stars.addItem(rs.getInt(1));    
+            }
+            con.close();
+        }
+        catch(SQLException e)
+        {
+            System.out.println("SQLException: " + e.getMessage());
+            System.out.println("SQLState: " + e.getSQLState());
+            System.out.println("VendorError: " + e.getErrorCode());
+        }
+        JButton btnAddToDB = new JButton("Add Review");
+        btnAddToDB.addActionListener(new AddToDBListener());
+        btnAddToDB.setBackground(new Color(0,255,0));
+        btnAddToDB.setBorderPainted(false);
+        box.add(lblName);
+        box.add(movie_name);
+        box.add(Box.createRigidArea(new Dimension (10,50)));
+        box.add(lblRating);
+        box.add(rating_stars);
+        box.add(Box.createRigidArea(new Dimension (10,50)));
+        box.add(lblReview);
+        //box.add(review);
+        JScrollPane pane1 = new JScrollPane(review,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        pane1.getVerticalScrollBar().setUnitIncrement(16);
+        box.add(BorderLayout.CENTER,pane1);
+        box.add(Box.createRigidArea(new Dimension (10,80)));
+       
+        box1.add(btnAddToDB);
+        box.add(box1);
+        panel.add(box);
+        JScrollPane pane = new JScrollPane(panel,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        pane.getVerticalScrollBar().setUnitIncrement(16);
+        frame.add(BorderLayout.CENTER,pane);
+        //frame.getContentPane().add(BorderLayout.CENTER,panel);
+        frame.getRootPane().setDefaultButton(btnAddToDB);
+        ImageIcon ficon=new ImageIcon("/home/ritom/Desktop/Java/DBMS/icon_cw.png");
+        frame.setIconImage(ficon.getImage());
+        frame.setMinimumSize(new Dimension(500,500));
+        frame.setResizable(false);
+        frame.pack();
+        frame.setVisible(true);
+    }
+
+    public class AddToDBListener implements ActionListener{
+        public void actionPerformed(ActionEvent event){
+            String naam="",naam2="",text="";
+            int rating=0;
+            try{
+                //get input from JComboBox
+                naam=(String)movie_name.getSelectedItem();
+                
+                naam2=naam.substring(0,naam.indexOf("("));//System.out.println("Name="+naam);
+                rating = (Integer)rating_stars.getSelectedItem();
+                text=review.getText().trim().replaceAll("'", "\'");
+                if(text.equals(""))throw new NullPointerException("Empty Review");
+                System.out.println(text);
+                int mid=0;
+                Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); 
+                Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
+                Statement stmt=con.createStatement();
+                ResultSet rs=stmt.executeQuery("SELECT year FROM movie WHERE name="+"'"+naam2+"'");
+                while(rs.next())
+                {
+                    int year=rs.getInt(1);
+                    //System.out.println(year);
+                    if(naam.contains(year+""))//considering that 1 name movie in 1 year
+                    {
+                        Statement stmt2 = con.createStatement();
+                        ResultSet rs2 = stmt2.executeQuery("SELECT mid FROM movie WHERE name='"+naam2+"' AND year="+year);
+                        rs2.next();
+                        mid=rs2.getInt(1);
+                    }
+                }
+                
+                Connection con2=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
+                Statement stmt2=con2.createStatement();
+                //System.out.println("INSERT INTO reviews VALUES(null,"+mid+","+user_id+","+rating+",\'"+text+"\');");            
+                stmt2.executeUpdate("INSERT INTO reviews VALUES(null,"+mid+","+user_id+","+rating+",\""+text+"\");");
+                con2.close();
+                frame.dispose();
+                
+
+            }
+            catch(SQLException e)
+            {
+                System.out.println("SQLException: " + e.getMessage());
+                System.out.println("SQLState: " + e.getSQLState());
+                System.out.println("VendorError: " + e.getErrorCode());
+                //e.getCause().getStackTrace();
+                e.printStackTrace();
+                if(e.getErrorCode()==1406)
+                {
+                    JOptionPane.showMessageDialog(null, "Your review exceeds the 600 character limit!", "Alert", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+            catch(NullPointerException e)
+            {
+                JOptionPane.showMessageDialog(null, "Review cannot be empty!", "Alert", JOptionPane.ERROR_MESSAGE);
+            }
+            catch(Exception e)
+            {
+                System.out.println(e);
+                e.printStackTrace();
+                System.out.println("Something went wrong");
+            }
+        } 
+            
     }
     
 }

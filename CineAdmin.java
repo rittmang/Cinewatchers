@@ -342,7 +342,7 @@ class AdminHome{
                 }
                 //all_movies+="\b";
                 rev.setText("<html>"+all_movies.replaceAll("<","&lt;").replaceAll(">", "&gt;").replaceAll("\n","<br />").replaceAll("\t","&nbsp;&nbsp;&nbsp;&nbsp;")+"</html>");
-                rev.setHorizontalAlignment(JLabel.CENTER);
+                rev.setHorizontalAlignment(JLabel.LEFT);
                 rev.setVerticalAlignment(JLabel.CENTER);
                 //Border border = BorderFactory.createLineBorder(Color.LIGHT_GRAY);
                 Border border = BorderFactory.createLineBorder(new Color(220,220,220));
