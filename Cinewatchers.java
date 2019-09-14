@@ -4,23 +4,15 @@ import javax.swing.BorderFactory;
 import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.Box;
-
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.BorderLayout;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
  //add new user (Register) in SQL table: insert into users (username,password,name) values ('ritom','ritom','Ritom');
@@ -278,7 +270,7 @@ class Home
             stmt=con.createStatement();
             rs=stmt.executeQuery("SELECT * FROM reviews WHERE userid="+user_id);
             
-            Box lol = Box.createHorizontalBox();
+            
             Box box2 = Box.createVerticalBox();
             JTextArea new_rev;
             JScrollPane pp=null;
@@ -286,18 +278,16 @@ class Home
             {
                 new_rev=new JTextArea();
                 new_rev.setMinimumSize(new Dimension(5,5));
-                //new_rev.setMaximumSize(new Dimension(5,5));
+                
                 new_rev.setColumns(5);
-                //rev.setMaximumSize(new Dimension(1000,768));
+                
                 int mid=rs.getInt(2);
                 Statement stmt2 = con.createStatement();
                 ResultSet rs2 = stmt2.executeQuery("SELECT name,year FROM movie WHERE mid="+mid);
                 rs2.next();String movie_name=rs2.getString(1)+" ("+rs2.getInt(2)+")";
                 all_reviews=movie_name+"\t"+rs.getInt(4)+"★"+"\n\n"+rs.getString(5).trim();
-                //rev.setText("<html><div style=\"width:50%;\">"+all_reviews.replaceAll("<","&lt;").replaceAll(">", "&gt;").replaceAll("\n","<br />")+"</div></html>");
                 new_rev.setText(all_reviews);
-                //rev.setHorizontalAlignment(JLabel.LEFT);
-                //rev.setVerticalAlignment(JLabel.CENTER);
+                
                 new_rev.setWrapStyleWord(true);new_rev.setLineWrap(true);new_rev.setEditable(false);new_rev.setFocusable(false);new_rev.setOpaque(false);
                 
                 Border border = BorderFactory.createLineBorder(new Color(220,220,220));
@@ -307,14 +297,11 @@ class Home
                 box2.add(pp);
                 box2.add(Box.createRigidArea(new Dimension (50,50)));
             }
-            //lol.add(box2);
-            //p.add(pp);
+            
             p.add(box2);
             new_frame.validate();
             new_frame.repaint();
-            //Dimension screensize = Toolkit.getDefaultToolkit().getScreenSize();
-            //new_frame.setSize(screensize.width/2,screensize.height/2);
-            //new_frame.add(pane);
+            
             already_shown=1;
             con.close();
             }

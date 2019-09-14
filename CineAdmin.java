@@ -168,7 +168,7 @@ public class CineAdmin{
 class AdminHome{
     
     String user_id="",user_name="";
-    JPanel p;JLabel rev;String all_movies="";
+    JPanel p;JLabel rev;String all_movies="",all_reviews="";
     JFrame new_frame;int already_shown=0;
     public void go(JFrame frame,String uid,String username)//uses same frame from Cinewatchers class
     {
@@ -237,28 +237,69 @@ class AdminHome{
             ResultSet rs=null;
             if(already_shown==1)
             {
-                JOptionPane.showMessageDialog(null,"All reviews done","Alert",JOptionPane.INFORMATION_MESSAGE);
+                already_shown=0;
+                //p.removeAll();
+                p = new JPanel();
+                new_frame.revalidate();new_frame.repaint();
+                new_frame.removeAll();
+                new_frame.dispose();
+                AdminHome h = new AdminHome();
+                
+                JFrame q = new JFrame("Cinewatchers Administrator Window");
+                ImageIcon ficon=new ImageIcon("/home/ritom/Desktop/Java/DBMS/icon_cw.png");
+                q.setIconImage(ficon.getImage());
+                q.setTitle("Cinewatchers Administrator");
+                q.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                q.getContentPane().add(BorderLayout.CENTER,p);
+                q.setExtendedState(JFrame.MAXIMIZED_BOTH);
+                h.go(q,user_id,user_name);
             }
             else{
             try{
             Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); 
             Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
             stmt=con.createStatement();
-            rs=stmt.executeQuery("SELECT * FROM reviews");
-            rev=new JLabel();
+            rs=stmt.executeQuery("select r.movieid,m.name, r.userid,r.text, r.stars, m.year from reviews r inner join movie m on r.movieid=m.mid order by m.year desc,r.movieid desc;");
+            
+            
+            Box box2 = Box.createVerticalBox();
+            JTextArea new_rev;
+            JScrollPane pp=null;
             while(rs.next())
             {
-                all_movies+=rs.getString(5)+"\n\n";    
+                new_rev=new JTextArea();
+                new_rev.setMinimumSize(new Dimension(5,5));
+                
+                new_rev.setColumns(5);
+                
+                //int mid=rs.getInt(1);
+                //Statement stmt2 = con.createStatement();
+                //ResultSet rs2 = stmt2.executeQuery("SELECT name,year FROM movie WHERE mid="+mid);
+                //rs2.next();
+                String movie_name=rs.getString(2)+" ("+rs.getInt(6)+")";
+
+                int uid=rs.getInt(3);
+                Statement stmt3=con.createStatement();
+                ResultSet rs3=stmt3.executeQuery("SELECT username FROM users WHERE uid="+uid);
+                rs3.next();
+                String usser=rs3.getString(1);
+                all_reviews=usser +"\t"+movie_name+"\t"+rs.getInt(5)+"★"+"\n\n"+rs.getString(4).trim();
+                new_rev.setText(all_reviews);
+                
+                new_rev.setWrapStyleWord(true);new_rev.setLineWrap(true);new_rev.setEditable(false);new_rev.setFocusable(false);new_rev.setOpaque(false);
+                
+                Border border = BorderFactory.createLineBorder(new Color(220,220,220));
+                new_rev.setBorder(border);
+                pp = new JScrollPane(new_rev,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+                //p.add(pp);
+                box2.add(pp);
+                box2.add(Box.createRigidArea(new Dimension (50,50)));
             }
-            rev.setText("<html>"+all_movies.replaceAll("<","&lt;").replaceAll(">", "&gt;").replaceAll("\n","<br />")+"</html>");
-            rev.setHorizontalAlignment(JLabel.CENTER);
-            rev.setVerticalAlignment(JLabel.CENTER);
-            Border border = BorderFactory.createLineBorder(Color.BLACK);
-            rev.setBorder(border);
-            Box box = Box.createHorizontalBox();box.add(rev);
-            p.add(box);
+            
+            p.add(box2);
             new_frame.validate();
             new_frame.repaint();
+            
             already_shown=1;
             con.close();
             }
@@ -271,6 +312,7 @@ class AdminHome{
             catch(Exception e)
             {
                 System.out.println(e);
+                e.printStackTrace();
             }
             finally{
                 if(rs!=null)
