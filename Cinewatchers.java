@@ -186,6 +186,7 @@ class Home
     String user_id="",user_name="",name="";
     JPanel p;JLabel rev;String all_reviews="",all_movies="";
     JFrame new_frame;int already_shown=0;
+    JScrollPane pane;
     public void go(JFrame frame,String uid,String username,String n)//uses same frame from Cinewatchers class
     {
         user_id=uid;
@@ -240,7 +241,7 @@ class Home
         p.add(box);
         p.add(Box.createRigidArea(new Dimension(0, 80)));
         
-        JScrollPane pane = new JScrollPane(p,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        pane = new JScrollPane(p,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         pane.getVerticalScrollBar().setUnitIncrement(16);
         new_frame.add(pane);
         new_frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -266,6 +267,8 @@ class Home
                 q.setIconImage(ficon.getImage());
                 q.setTitle("Cinewatchers");
                 q.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                q.getContentPane().add(BorderLayout.CENTER,p);
+                q.setExtendedState(JFrame.MAXIMIZED_BOTH);
                 h.go(q,user_id,user_name,name);
             }
             else{
@@ -275,25 +278,43 @@ class Home
             stmt=con.createStatement();
             rs=stmt.executeQuery("SELECT * FROM reviews WHERE userid="+user_id);
             
-            
+            Box lol = Box.createHorizontalBox();
             Box box2 = Box.createVerticalBox();
-
+            JTextArea new_rev;
+            JScrollPane pp=null;
             while(rs.next())
             {
-                rev=new JLabel();
-                all_reviews=rs.getString(5)+"\n\n";
-                rev.setText("<html><div style=\"width:100%;\">"+all_reviews.replaceAll("<","&lt;").replaceAll(">", "&gt;").replaceAll("\n","<br />")+"</html>");
-            rev.setHorizontalAlignment(JLabel.LEFT);
-            rev.setVerticalAlignment(JLabel.CENTER);
-            Border border = BorderFactory.createLineBorder(Color.BLACK);
-            rev.setBorder(border); 
-            box2.add(rev);
-            
+                new_rev=new JTextArea();
+                new_rev.setMinimumSize(new Dimension(5,5));
+                //new_rev.setMaximumSize(new Dimension(5,5));
+                new_rev.setColumns(5);
+                //rev.setMaximumSize(new Dimension(1000,768));
+                int mid=rs.getInt(2);
+                Statement stmt2 = con.createStatement();
+                ResultSet rs2 = stmt2.executeQuery("SELECT name,year FROM movie WHERE mid="+mid);
+                rs2.next();String movie_name=rs2.getString(1)+" ("+rs2.getInt(2)+")";
+                all_reviews=movie_name+"\t"+rs.getInt(4)+"★"+"\n\n"+rs.getString(5).trim();
+                //rev.setText("<html><div style=\"width:50%;\">"+all_reviews.replaceAll("<","&lt;").replaceAll(">", "&gt;").replaceAll("\n","<br />")+"</div></html>");
+                new_rev.setText(all_reviews);
+                //rev.setHorizontalAlignment(JLabel.LEFT);
+                //rev.setVerticalAlignment(JLabel.CENTER);
+                new_rev.setWrapStyleWord(true);new_rev.setLineWrap(true);new_rev.setEditable(false);new_rev.setFocusable(false);new_rev.setOpaque(false);
+                
+                Border border = BorderFactory.createLineBorder(new Color(220,220,220));
+                new_rev.setBorder(border);
+                pp = new JScrollPane(new_rev,ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+                //p.add(pp);
+                box2.add(pp);
+                box2.add(Box.createRigidArea(new Dimension (50,50)));
             }
-            
-            p.add(box);
+            //lol.add(box2);
+            //p.add(pp);
+            p.add(box2);
             new_frame.validate();
             new_frame.repaint();
+            //Dimension screensize = Toolkit.getDefaultToolkit().getScreenSize();
+            //new_frame.setSize(screensize.width/2,screensize.height/2);
+            //new_frame.add(pane);
             already_shown=1;
             con.close();
             }
