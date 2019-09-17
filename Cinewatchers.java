@@ -514,18 +514,23 @@ class Register
         btnRegister.addActionListener(new RegisterListener());
         JButton btnCancel = new JButton("Clear");
         btnCancel.addActionListener(new CancelListener());
+        Box box = Box.createVerticalBox();
+        Box btnsec=Box.createHorizontalBox();
         
-     
- 
-        panel.add(lblUsername);
-        panel.add(txtUsername);
-        panel.add(lblPassword);
-        panel.add(txtPassword);
-        panel.add(lblName);
-        panel.add(txtName);
-
-        panel.add(btnRegister);
-        panel.add(btnCancel);         
+        box.add(lblUsername);
+        box.add(txtUsername);
+        box.add(Box.createRigidArea(new Dimension (10,30)));
+        box.add(lblPassword);
+        box.add(txtPassword);
+        box.add(Box.createRigidArea(new Dimension (10,30)));
+        box.add(lblName);
+        box.add(txtName);
+        box.add(Box.createRigidArea(new Dimension (10,30)));
+        btnsec.add(btnRegister);
+        btnsec.add(Box.createRigidArea(new Dimension (30,10)));
+        btnsec.add(btnCancel);
+        panel.add(box);
+        panel.add(btnsec);         
         frame.getContentPane().add(BorderLayout.CENTER,panel);
         frame.getRootPane().setDefaultButton(btnRegister);
         ImageIcon ficon=new ImageIcon("/home/ritom/Desktop/Java/DBMS/icon_cw.png");

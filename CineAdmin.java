@@ -562,7 +562,9 @@ class AddMovies
         box.add(lblYear);
         box.add(txtYear);//need to add image area as well
         box.add(Box.createRigidArea(new Dimension (10,80)));
-        box.add(Box.createRigidArea(new Dimension(10,200)));box.add(lblGenre);box.add(genre);box.add(jta);
+        box.add(Box.createRigidArea(new Dimension(10,200)));box.add(lblGenre);box.add(genre);
+        box.add(Box.createRigidArea(new Dimension (10,20)));
+        box.add(jta);
         box.add(Box.createRigidArea(new Dimension (10,100)));
         //box1.add(Box.createRigidArea(new Dimension (10,160)));
         box1.add(btnDeleteMovie);
@@ -668,6 +670,11 @@ class AddMovies
             {
                 System.out.println("Movie name wasn't entered");
                 JOptionPane.showMessageDialog(null, "Movie name not entered", "Alert", JOptionPane.ERROR_MESSAGE);
+            }
+            catch(StringIndexOutOfBoundsException e)
+            {
+                System.out.println("Genre wasn't entered");
+                JOptionPane.showMessageDialog(null, "Genre not entered", "Alert", JOptionPane.ERROR_MESSAGE);
             }
             catch(Exception e)
             {
@@ -799,7 +806,9 @@ class EditMovies
         box.add(txtYear);//need to add image area as well
         box.add(Box.createRigidArea(new Dimension (10,50)));
         //box.add(Box.createRigidArea(new Dimension(10,200)));
-        box.add(lblGenre);box.add(genre);box.add(jta);
+        box.add(lblGenre);box.add(genre);
+        box.add(Box.createRigidArea(new Dimension (10,20)));
+        box.add(jta);
         box.add(Box.createRigidArea(new Dimension (10,100)));
         //box1.add(Box.createRigidArea(new Dimension (10,160)));
         box1.add(btnDeleteMovie);
