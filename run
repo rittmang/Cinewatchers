@@ -1,0 +1,26 @@
+#!/bin/bash
+spinner() {
+    local i sp n
+    sp='/-\|'
+    n=${#sp}
+    printf ' '
+    while sleep 0.1; do
+        printf "%s\b" "${sp:i++%n:1}"
+    done
+}
+
+THE_CLASSPATH=
+PROGRAM_NAME=Cinewatchers.java
+
+javac $PROGRAM_NAME
+
+if [ $? -eq 0 ]
+then
+    echo "Starting Cinewatchers v1.0"
+    sleep .1
+    spinner &
+    sleep 2
+    kill "$!"
+fi
+
+java Cinewatchers
