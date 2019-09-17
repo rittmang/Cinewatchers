@@ -202,12 +202,12 @@ class AdminHome{
         
         JButton btnShowMovies = new JButton("Show movie database");
         JButton btnAddMovies = new JButton("Add movie");
-        JButton btnAddGenre = new JButton("Add genre");
+        JButton btnEditMovies = new JButton("Edit/Delete movie");
         JButton btnRefresh = new JButton("Refresh");
         JButton btnLogout = new JButton("Log out");
         btnShowMovies.addActionListener(new ShowMoviesListener());
         btnAddMovies.addActionListener(new AddMoviesListener());
-        btnAddGenre.addActionListener(new AddGenreListener());
+        btnEditMovies.addActionListener(new EditMoviesListener());
         btnRefresh.addActionListener(new RefreshListener());
         btnLogout.addActionListener(new LogoutListener());
         //box.add(l);
@@ -217,7 +217,7 @@ class AdminHome{
         box.add(Box.createRigidArea(new Dimension (50,10)));
         box.add(btnAddMovies);
         box.add(Box.createRigidArea(new Dimension (50,10)));
-        box.add(btnAddGenre);
+        box.add(btnEditMovies);
         box.add(Box.createRigidArea(new Dimension (50,10)));
         box.add(btnRefresh);
         box.add(Box.createRigidArea(new Dimension (50,10)));
@@ -373,15 +373,16 @@ class AdminHome{
                 rev.setPreferredSize(new Dimension(500,100));
                 all_movies=rs.getString(2)+"\t\t\t"+rs.getInt(3)+"\n\n";
                 int mid=rs.getInt(1);
-                Statement stmt3=con.createStatement();
-                rs3=stmt3.executeQuery("SELECT mgenre FROM comes_in WHERE movieid="+mid);
-                while(rs3.next())
-                {
+                //Statement stmt3=con.createStatement();
+                //rs3=stmt3.executeQuery("SELECT genre FROM movie WHERE mid="+mid);
+                // while(rs3.next())
+                // {
                     
-                    all_movies+=rs3.getString(1);
-                    if(!rs3.isLast())
-                        all_movies+=", ";
-                }
+                //     all_movies+=rs3.getString(1);
+                //     if(!rs3.isLast())
+                //         all_movies+=", ";
+                // }
+                all_movies+=rs.getString(5);
                 //all_movies+="\b";
                 rev.setText("<html>"+all_movies.replaceAll("<","&lt;").replaceAll(">", "&gt;").replaceAll("\n","<br />").replaceAll("\t","&nbsp;&nbsp;&nbsp;&nbsp;")+"</html>");
                 rev.setHorizontalAlignment(JLabel.LEFT);
@@ -460,10 +461,10 @@ class AdminHome{
             r.go();
         }
     }
-    public class AddGenreListener implements ActionListener{
+    public class EditMoviesListener implements ActionListener{
         public void actionPerformed(ActionEvent event){
             //btnAddMovies.requestFocus();
-            AddGenre r=new AddGenre();
+            EditMovies r=new EditMovies();
             r.go();
         }
     }
@@ -501,6 +502,7 @@ class AddMovies
     JLabel img;
     JFrame frame;
     Box box;
+    JTextArea jta=null;
     //int already_shown;
     public void go()
     {
@@ -511,6 +513,7 @@ class AddMovies
         JPanel panel = new JPanel();
         JLabel lblName = new JLabel("Enter Movie Name: [max 30]");   
         JLabel lblYear = new JLabel("Enter Year: ");
+        JLabel lblGenre = new JLabel("Select genre/s:");
         img = new JLabel();img.setBounds(10,120,140,250);//changed 670 to 250
         box = Box.createVerticalBox();
         box.setBorder(new EmptyBorder(0, 0, 0, 0));
@@ -518,8 +521,39 @@ class AddMovies
         box1.setBorder(new EmptyBorder(0,0,0,0));
         txtName = new JTextField(30);
         txtYear = new JTextField(4);
-        JButton btnChooseImage = new JButton("Choose Image");
-        btnChooseImage.addActionListener(new ChooseImageListener());
+        JButton btnDeleteMovie = new JButton("Choose Image");
+        btnDeleteMovie.addActionListener(new DeleteMovieListener());
+        JComboBox<String> genre=new JComboBox<>();
+        jta = new JTextArea(5,5);jta.setLineWrap(true);jta.setWrapStyleWord(true);
+        try{
+            //add code to fill genre and movie_name stuff
+            Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
+            Statement stmt=con.createStatement();Statement stmt2=con.createStatement();
+            ResultSet rs=stmt.executeQuery("SELECT * FROM genre");
+            ResultSet rs2=stmt2.executeQuery("SELECT name,year FROM movie ORDER BY year DESC");
+            while(rs.next())
+            {
+                genre.addItem(rs.getString(1));    
+            }
+            con.close();
+        }
+        catch(SQLException e)
+        {
+            System.out.println("SQLException: " + e.getMessage());
+            System.out.println("SQLState: " + e.getSQLState());
+            System.out.println("VendorError: " + e.getErrorCode());
+        }
+        ActionListener act = new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                String s=jta.getText();
+                s+=","+genre.getSelectedItem();
+                jta.setText(s);
+            }
+        };
+        genre.addActionListener(act);
         JButton btnAddToDB = new JButton("Add to Cinewatchers");
         btnAddToDB.addActionListener(new AddToDBListener());
         box.add(lblName);
@@ -528,24 +562,25 @@ class AddMovies
         box.add(lblYear);
         box.add(txtYear);//need to add image area as well
         box.add(Box.createRigidArea(new Dimension (10,80)));
-        box.add(Box.createRigidArea(new Dimension (10,160)));
-        box1.add(Box.createRigidArea(new Dimension (10,160)));
-        box1.add(btnChooseImage);
+        box.add(Box.createRigidArea(new Dimension(10,200)));box.add(lblGenre);box.add(genre);box.add(jta);
+        box.add(Box.createRigidArea(new Dimension (10,100)));
+        //box1.add(Box.createRigidArea(new Dimension (10,160)));
+        box1.add(btnDeleteMovie);
         box1.add(Box.createRigidArea(new Dimension (50,10)));
         box1.add(btnAddToDB);
         box.add(box1);
         panel.add(box);    
         frame.getContentPane().add(BorderLayout.CENTER,panel);
-        frame.getRootPane().setDefaultButton(btnChooseImage);
+        frame.getRootPane().setDefaultButton(btnDeleteMovie);
         ImageIcon ficon=new ImageIcon("/home/ritom/Desktop/Java/DBMS/icon_cw.png");
         frame.setIconImage(ficon.getImage());
-        frame.setSize(200,800);
+        frame.setSize(200,900);
         frame.setResizable(false);
         frame.pack();
         frame.setVisible(true);
     }
 
-    public class ChooseImageListener implements ActionListener{
+    public class DeleteMovieListener implements ActionListener{
         public void actionPerformed(ActionEvent event){
             try{
             
@@ -590,7 +625,7 @@ class AddMovies
             try{
                 Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); 
                 Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
-                PreparedStatement ps=con.prepareStatement("INSERT INTO movie VALUES(?,?,?,?)");
+                PreparedStatement ps=con.prepareStatement("INSERT INTO movie VALUES(?,?,?,?,?)");
                 InputStream is = new FileInputStream(new File(s));
                 ps.setNull(1, java.sql.Types.INTEGER);
                 if(!txtName.getText().equals(""))
@@ -599,6 +634,7 @@ class AddMovies
                     {is.close();throw new NullPointerException("Empty Movie Name");}
                 ps.setInt(3,Integer.parseInt(txtYear.getText()));
                 ps.setBlob(4, is);
+                ps.setString(5,jta.getText().substring(1));
                 ps.executeUpdate();
                 JOptionPane.showMessageDialog(null, "Data inserted successfully", "Alert", JOptionPane.INFORMATION_MESSAGE);
                 //already_shown = 0;
@@ -647,50 +683,57 @@ class AddMovies
     
 }
 
-class AddGenre
+class EditMovies
 {
     String msg = "",s="";
-    //JTextField txtName = null;
-    //JTextField txtYear=null;
-    //JLabel img;
-    JComboBox<String> movie_name=null;
-    JComboBox<String> genre=null;
+    JTextField txtName = null;
+    JTextField txtYear=null;
+    JLabel img;
     JFrame frame;
     Box box;
+    JTextArea jta=null;
+    JComboBox<String> movie_chooser;
     //int already_shown;
     public void go()
     {
         //already_shown = as;
-        frame = new JFrame("CW - Add Genre");
-        frame.setTitle("CW - Add Genre");
+        frame = new JFrame("CW - Edit Movie");
+        frame.setTitle("CW - Edit Movie");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         JPanel panel = new JPanel();
-        JLabel lblName = new JLabel("Choose Movie:");   
-        JLabel lblYear = new JLabel("Choose Genre: ");
-        //img = new JLabel();img.setBounds(10,120,140,250);//changed 670 to 250
+        JLabel lblName = new JLabel("Change Movie Name: [max 30]");   
+        JLabel lblYear = new JLabel("Change Year: ");
+        JLabel lblGenre = new JLabel("Edit genre/s:");
+        img = new JLabel();img.setBounds(10,120,140,250);//changed 670 to 250
         box = Box.createVerticalBox();
         box.setBorder(new EmptyBorder(0, 0, 0, 0));
         Box box1 = Box.createHorizontalBox();
         box1.setBorder(new EmptyBorder(0,0,0,0));
-        //txtName = new JTextField(30);
-        //txtYear = new JTextField(4);
-        //JButton btnChooseImage = new JButton("Choose Image");
-        //btnChooseImage.addActionListener(new ChooseImageListener());
-        movie_name = new JComboBox<>();//JComboBox is now Generic, apparently
-        genre = new JComboBox<>();
+        txtName = new JTextField(30);
+        txtYear = new JTextField(4);
+        JButton btnDeleteMovie = new JButton("Delete Movie");
+        btnDeleteMovie.setBackground(Color.red);
+        btnDeleteMovie.addActionListener(new DeleteMovieListener());
+        movie_chooser=new JComboBox<>();
+        JComboBox<String> genre=new JComboBox<>();
+        
+        jta = new JTextArea(5,5);jta.setLineWrap(true);jta.setWrapStyleWord(true);
         try{
             //add code to fill genre and movie_name stuff
             Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
             Statement stmt=con.createStatement();Statement stmt2=con.createStatement();
             ResultSet rs=stmt.executeQuery("SELECT * FROM genre");
             ResultSet rs2=stmt2.executeQuery("SELECT name,year FROM movie ORDER BY year DESC");
-            while(rs2.next())
-            {
-                movie_name.addItem(rs2.getString(1)+" ("+rs2.getInt(2)+")");    
-            }
+            
+            movie_chooser.addItem("");
             while(rs.next())
             {
                 genre.addItem(rs.getString(1));    
+            }
+            while(rs2.next())
+            {
+                movie_chooser.addItem(rs2.getString(1)+" ("+rs2.getInt(2)+")");
+                
             }
             con.close();
         }
@@ -700,66 +743,141 @@ class AddGenre
             System.out.println("SQLState: " + e.getSQLState());
             System.out.println("VendorError: " + e.getErrorCode());
         }
-        JButton btnAddToDB = new JButton("Update Movie Info");
+        ActionListener act = new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                String s=jta.getText();
+                if(s.charAt(0)==',')
+                    jta.setText(s);
+                else
+                    jta.setText(","+s);
+                s+=","+genre.getSelectedItem();
+                jta.setText(s);
+                //if(jta.getText().charAt(0)==','&&jta.getText().charAt(1)==',')
+                  //  jta.setText(s.substring(1));
+                
+            }
+        };
+        ActionListener act2 = new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+            
+                String s= (String) movie_chooser.getSelectedItem();
+                if(s.equals(""))return;
+                txtName.setText(s.substring(0,s.lastIndexOf(' ')));
+                txtYear.setText(s.substring(s.indexOf('(')+1,s.indexOf(')')));
+                try{
+                Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
+                Statement s3=con.createStatement();
+                ResultSet rs=s3.executeQuery("SELECT genre FROM movie WHERE name='"+txtName.getText()+ "' AND year="+Integer.parseInt(txtYear.getText()));
+                rs.next();
+                jta.setText(","+rs.getString(1));
+                }
+                catch(SQLException e1)
+                {
+                    System.out.println("SQLException: " + e1.getMessage());
+                    System.out.println("SQLState: " + e1.getSQLState());
+                    System.out.println("VendorError: " + e1.getErrorCode());
+                }
+                
+            }
+        };
+        genre.addActionListener(act);
+        movie_chooser.addActionListener(act2);
+        JButton btnAddToDB = new JButton("Make changes in Cinewatchers");
         btnAddToDB.addActionListener(new AddToDBListener());
+        box.add(movie_chooser);
+        box.add(Box.createRigidArea(new Dimension(10,50)));
         box.add(lblName);
-        box.add(movie_name);
+        box.add(txtName);
         box.add(Box.createRigidArea(new Dimension (10,50)));
         box.add(lblYear);
-        box.add(genre);//need to add image area as well
-        box.add(Box.createRigidArea(new Dimension (10,80)));
+        box.add(txtYear);//need to add image area as well
+        box.add(Box.createRigidArea(new Dimension (10,50)));
+        //box.add(Box.createRigidArea(new Dimension(10,200)));
+        box.add(lblGenre);box.add(genre);box.add(jta);
+        box.add(Box.createRigidArea(new Dimension (10,100)));
         //box1.add(Box.createRigidArea(new Dimension (10,160)));
-        //box1.add(btnChooseImage);
-        //box1.add(Box.createRigidArea(new Dimension (50,10)));
+        box1.add(btnDeleteMovie);
+        box1.add(Box.createRigidArea(new Dimension (50,10)));
         box1.add(btnAddToDB);
         box.add(box1);
         panel.add(box);    
         frame.getContentPane().add(BorderLayout.CENTER,panel);
-        frame.getRootPane().setDefaultButton(btnAddToDB);
+        frame.getRootPane().setDefaultButton(btnDeleteMovie);
         ImageIcon ficon=new ImageIcon("/home/ritom/Desktop/Java/DBMS/icon_cw.png");
         frame.setIconImage(ficon.getImage());
-        frame.setSize(200,800);
+        frame.setSize(200,900);
         frame.setResizable(false);
         frame.pack();
         frame.setVisible(true);
     }
 
+    public class DeleteMovieListener implements ActionListener{
+        public void actionPerformed(ActionEvent event){
+            try{
+            
+                int output=JOptionPane.showConfirmDialog(frame,"Delete Movie?","Cinewatchers",JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.WARNING_MESSAGE);
+                if(output==JOptionPane.YES_OPTION)
+                {
+                    Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
+                    //Statement stmt=con.createStatement();
+                    //ResultSet rs=stmt.executeQuery("DELETE FROM movie WHERE name='"+txtName.getText()+ "' AND year="+Integer.parseInt(txtYear.getText()));
+                    PreparedStatement ps=con.prepareStatement("DELETE FROM movie WHERE name=? AND year=?");
+                    ps.setString(1, txtName.getText());
+                    ps.setInt(2,Integer.parseInt(txtYear.getText()));
+                    ps.execute();
+                    JOptionPane.showMessageDialog(null, "Movie deleted from Cinewatchers", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    frame.dispose();
+                }
+                
+            }
+            catch(SQLException e)
+            {
+                e.printStackTrace();
+            }        
+            catch(NumberFormatException e)
+            {
+                JOptionPane.showMessageDialog(null, "Something went wrong", "Error", JOptionPane.ERROR_MESSAGE);
+            }         
+         }
+    }
     public class AddToDBListener implements ActionListener{
         public void actionPerformed(ActionEvent event){
-            String naam="",naam2="",gaanre="";
+
             try{
-                //get input from JComboBox
-                naam=(String)movie_name.getSelectedItem();
-                
-                naam2=naam.substring(0,naam.indexOf("("));//System.out.println("Name="+naam);
-                gaanre = (String)genre.getSelectedItem();
-                int mid=0;
                 Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); 
                 Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
-                Statement stmt=con.createStatement();
-                ResultSet rs=stmt.executeQuery("SELECT year FROM movie WHERE name="+"'"+naam2+"'");
-                while(rs.next())
+                String s= (String) movie_chooser.getSelectedItem();
+                String previous_movie=s.substring(0,s.lastIndexOf(' '));
+                String previous_year=s.substring(s.indexOf('(')+1,s.indexOf(')'));
+
+                PreparedStatement ps=con.prepareStatement("UPDATE movie SET name=?,year=?,genre=? WHERE name='"+previous_movie+"' AND year="+ Integer.parseInt(previous_year));
+                if(txtName.getText().equals(""))
                 {
-                    int year=rs.getInt(1);
-                    //System.out.println(year);
-                    if(naam.contains(year+""))//considering that 1 name movie in 1 year
-                    {
-                        Statement stmt2 = con.createStatement();
-                        ResultSet rs2 = stmt2.executeQuery("SELECT mid FROM movie WHERE name='"+naam2+"' AND year="+year);
-                        rs2.next();
-                        mid=rs2.getInt(1);
-                    }
+                    throw new NullPointerException("Empty Movie Name");
                 }
-                //if(mid == 0){throw new Exception("Umm, what happened again?");}                
-                
-                //add COMES_IN LOGIC HERE::::::::::::::::::::::::::::::::::::::::::::::::::::::>>>>>>>>>>>>>
-                Connection con2=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
-                Statement stmt2=con2.createStatement();
-                //System.out.println("INSERT INTO comes_in VALUES("+mid+","+"'"+gaanre+"');");            
-                stmt2.executeUpdate("INSERT INTO comes_in VALUES("+mid+","+"'"+gaanre+"');");
-                con2.close();
+                if(jta.getText().lastIndexOf(',')==0 && jta.getText().length()>1)
+                {
+                    throw new ArithmeticException("Empty Genre");
+                }
+                ps.setString(1, txtName.getText());
+                ps.setInt(2, Integer.parseInt(txtYear.getText()));
+                if(jta.getText().charAt(0)==',' && jta.getText().charAt(1)==',')
+                    ps.setString(3,jta.getText().substring(2));
+                if(jta.getText().charAt(0)==',' && jta.getText().charAt(1)!=',')
+                    ps.setString(3,jta.getText().substring(1));
+                if(jta.getText().charAt(0)!=',')
+                    ps.setString(3,","+jta.getText().substring(2));
+                ps.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Data updated successfully", "Alert", JOptionPane.INFORMATION_MESSAGE);
+                //already_shown = 0;
+                con.close();
                 frame.dispose();
-                
 
             }
             catch(SQLException e)
@@ -767,22 +885,41 @@ class AddGenre
                 System.out.println("SQLException: " + e.getMessage());
                 System.out.println("SQLState: " + e.getSQLState());
                 System.out.println("VendorError: " + e.getErrorCode());
-                //e.getCause().getStackTrace();
-                e.printStackTrace();
+                
                 if(e.getErrorCode()==1062)
                 {
-                    JOptionPane.showMessageDialog(null, naam+" is already tagged "+gaanre, "Alert", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Duplicate entry found. Cinewatchers cannot support duplicate (name,year) pairs in this version.", "Alert", JOptionPane.ERROR_MESSAGE);
                 }
+            }
+            catch(NumberFormatException e)
+            {
+                JOptionPane.showMessageDialog(null, "Year not entered", "Alert", JOptionPane.ERROR_MESSAGE);
+            }
+            
+            catch(NullPointerException e)
+            {
+                System.out.println("Movie name wasn't entered");
+                JOptionPane.showMessageDialog(null, "Movie name not entered", "Alert", JOptionPane.ERROR_MESSAGE);
+            }
+            catch(StringIndexOutOfBoundsException e)
+            {
+                System.out.println("Genre seems to be empty");
+                JOptionPane.showMessageDialog(null, "Genre seems to be empty", "Alert", JOptionPane.ERROR_MESSAGE);
+            }
+            catch(ArithmeticException e)
+            {
+                System.out.println("Genre wasn't entered");
+                JOptionPane.showMessageDialog(null, "Genre not entered", "Alert", JOptionPane.ERROR_MESSAGE);
             }
             catch(Exception e)
             {
-                System.out.println(e);
+                System.out.println(e.getClass());
                 e.printStackTrace();
+                JOptionPane.showMessageDialog(null, "Something went wrong", "Alert", JOptionPane.ERROR_MESSAGE);
                 System.out.println("Something went wrong");
             }
         } 
             
     }
-    
     
 }

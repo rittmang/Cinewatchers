@@ -374,16 +374,17 @@ class Home
                 rev.setPreferredSize(new Dimension(500,100));
                 all_movies=rs.getString(2)+"\t\t\t"+rs.getInt(3)+"\n\n";
                 int mid=rs.getInt(1);
-                Statement stmt3=con.createStatement();
-                rs3=stmt3.executeQuery("SELECT mgenre FROM comes_in WHERE movieid="+mid);
-                while(rs3.next())
-                {
+                // Statement stmt3=con.createStatement();
+                // rs3=stmt3.executeQuery("SELECT mgenre FROM comes_in WHERE movieid="+mid);
+                // while(rs3.next())
+                // {
                     
-                    all_movies+=rs3.getString(1);
-                    if(!rs3.isLast())
-                        all_movies+=", ";
-                }
+                //     all_movies+=rs3.getString(1);
+                //     if(!rs3.isLast())
+                //         all_movies+=", ";
+                // }
                 //all_movies+="\b";
+                all_movies+=rs.getString(5);
                 rev.setText("<html>"+all_movies.replaceAll("<","&lt;").replaceAll(">", "&gt;").replaceAll("\n","<br />").replaceAll("\t","&nbsp;&nbsp;&nbsp;&nbsp;")+"</html>");
                 rev.setHorizontalAlignment(JLabel.LEFT);
                 rev.setVerticalAlignment(JLabel.CENTER);
