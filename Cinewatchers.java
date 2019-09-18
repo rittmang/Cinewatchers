@@ -622,7 +622,7 @@ class AddReview
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         JPanel panel = new JPanel();
         JLabel lblName = new JLabel("Choose Movie:");   
-        JLabel lblRating = new JLabel("Choose Rating(1-5): ");
+        JLabel lblRating = new JLabel("Choose Rating(1-10): ");
         JLabel lblReview = new JLabel("Enter review:");
 
         box = Box.createVerticalBox();
