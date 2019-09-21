@@ -27,6 +27,8 @@ mysql> desc users;
 create table reviews(reviewid int primary key auto_increment,movieid int not null,userid int not null, stars int not null, text varchar(120) not null,foreign key (movieid) references movie(mid),foreign key (userid) references users(uid),foreign key (stars) references stars_allowed(val));
 alter table reviews add constraint fk2 foreign key(movieid) references movie(mid) on delete cascade;
 
+alter table reviews add constraint fk3 foreign key(userid) references user(uid) on delete cascade;
+
 insert into genre values('Adventure'),('Comedy'),('Crime'),('Drama'),('Fantasy'),('Historical'),('Historical fiction'),('Horror'),('Magical realism'),('Mystery'),('Paranoid fiction'),('Philosophical'),('Political'),('Romance'),('Saga'),('Satire'),('Science fiction'),('Social'),('Speculative'),('Thriller'),('urban'),('Western');
 
 create table admin(aid int primary key auto_increment,uname char(20) unique not null,pword char(20) not null);
