@@ -72,8 +72,7 @@ public class Cinewatchers{
             try{
             Class.forName("com.mysql.cj.jdbc.Driver").newInstance(); 
             Connection con=DriverManager.getConnection("jdbc:mysql://localhost:3306/cinewatchers","ritom","123123123");
-            //Connection con=DriverManager.getConnection("jdbc:mysql://rightonrittman.mysql.database.azure.com:3306/cinewatchers?useSSL=true&requireSSL=false","jumperwire@rightonrittman","123123123a!");
-            //Connection con=DriverManager.getConnection("jdbc:mysql://cinewatchers2.mysql.database.azure.com:3306/cinewatchers?useSSL=true&requireSSL=false&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC","thisissmall@cinewatchers2","123123123a!");
+            
             
             stmt=con.createStatement();
             rs=stmt.executeQuery("SELECT * FROM users");
@@ -374,16 +373,7 @@ class Home
                 rev.setPreferredSize(new Dimension(500,100));
                 all_movies=rs.getString(2)+"\t\t\t"+rs.getInt(3)+"\n\n";
                 int mid=rs.getInt(1);
-                // Statement stmt3=con.createStatement();
-                // rs3=stmt3.executeQuery("SELECT mgenre FROM comes_in WHERE movieid="+mid);
-                // while(rs3.next())
-                // {
-                    
-                //     all_movies+=rs3.getString(1);
-                //     if(!rs3.isLast())
-                //         all_movies+=", ";
-                // }
-                //all_movies+="\b";
+                
                 all_movies+=rs.getString(5);
                 rev.setText("<html>"+all_movies.replaceAll("<","&lt;").replaceAll(">", "&gt;").replaceAll("\n","<br />").replaceAll("\t","&nbsp;&nbsp;&nbsp;&nbsp;")+"</html>");
                 rev.setHorizontalAlignment(JLabel.LEFT);
@@ -418,8 +408,7 @@ class Home
                 full = Box.createVerticalBox();
                 
             }
-            //full.add(box);
-            //p.add(full);
+            
             new_frame.validate();
             new_frame.repaint();
             already_shown=1;
@@ -451,7 +440,7 @@ class Home
             }
             }
         }
-           // JOptionPane.showMessageDialog(null,msg,"Alert",JOptionPane.INFORMATION_MESSAGE);
+           
                               
         }
     }
